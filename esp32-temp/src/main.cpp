@@ -1,12 +1,18 @@
 #include <Arduino.h>
 #include "HIH8000_I2C.h"
 
+
+#define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
+#define TIME_TO_SLEEP  60 
+
 void fetchMeas();
 bool trigMeas();
 
+RTC_DATA_ATTR int bootCount = 0;
 
 
-HIH8000_I2C hihSensor = HIH8000_I2C(0x27);
+
+HIH8000_I2C hihSensor = HIH8000_I2C(0x02);
 
 HIH8000_I2C sensors[1];
 
@@ -18,22 +24,34 @@ char serialReadBuffer[2];
 void setup() {
   // put your setup code here, to run once:
   Wire.begin();
-  Wire.setClock(100000);
+  Wire.setClock(400000);
   Serial.begin(9600);
   trigSuccess = trigMeas();
+
+  ++bootCount;
+  Serial.println("Boot number: " + String(bootCount));
+
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+  
+  delay(1000);
+
+
 }
 
 void loop() {
+
   if (getReading)
   {
     if (trigSuccess) {
       fetchMeas();
     }
     
-    trigSuccess = trigMeas();
-    
-    delay(5000);
+    trigSuccess = trigMeas();    
   }
+
+  Serial.println("Going to sleep now");
+  Serial.flush(); 
+  esp_deep_sleep_start();
 }
 
 bool trigMeas() {
