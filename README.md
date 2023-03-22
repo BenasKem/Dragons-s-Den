@@ -11,3 +11,6 @@ A summary of work with dates
 ## 2023-03-15: Initial ESP-32 project 
 - Created a project with *VSCode* using *platform.io*;
 - Scanned temperature sensors to check if they have different addresses (they do);
+
+## 2023-03-22: Periodic Measurements
+- Tried out the deep sleep function with the timer wake-up function
